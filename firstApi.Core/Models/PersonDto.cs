@@ -4,7 +4,7 @@ using System.Text;
 
 namespace firstApi.Core.Models
 {
-    class Person
+    public class PersonDto
     {
         public int Id { get; set; }
         public string FirstName { get; set; }
