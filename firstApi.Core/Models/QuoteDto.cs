@@ -4,13 +4,9 @@ using System.Text;
 
 namespace firstApi.Core.Models
 {
-    public class PersonDto
+    public class QuoteDto
     {
         public int Id { get; set; }
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
         public string Description { get; set; }
-
-        public IEnumerable<QuoteDto> Quotes { get; set; }
     }
 }
