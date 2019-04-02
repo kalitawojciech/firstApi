@@ -1,4 +1,5 @@
-﻿using firstApi.Infrastructure;
+﻿using firstApi.Core.Models;
+using firstApi.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -22,7 +23,7 @@ namespace firstApi.Api.Controllers
             return Ok(person.Quotes);
         }
 
-        [HttpGet("{personId}/quotes/{quoteId}")]
+        [HttpGet("{personId}/quotes/{quoteId}", Name = "GetQuote")]
         public IActionResult GetQuote(int personId, int quoteId)
         {
             var person = PeopleDataStore.Current.People.FirstOrDefault(p => p.Id == personId);
@@ -36,6 +37,33 @@ namespace firstApi.Api.Controllers
                 return NotFound();
             }
             return Ok(quote);
+        }
+
+        [HttpPost("{personId}/quote")]
+        public IActionResult CreateQuote(int personId, [FromBody] QuoteForCreationDto quote)
+        {
+            if(quote == null)
+            {
+                return BadRequest();
+            }
+
+            var person = PeopleDataStore.Current.People.FirstOrDefault(p => p.Id == personId);
+            if (person == null)
+            {
+                return NotFound();
+            }
+
+            var maxQuoteId = PeopleDataStore.Current.People.SelectMany(q => q.Quotes).Max(q => q.Id);
+
+            var newQuote = new QuoteDto()
+            {
+                Id = ++maxQuoteId,
+                Description = quote.Description
+            };
+
+            person.Quotes.Add(newQuote);
+
+            return CreatedAtRoute("GetQuote", new { personId = person.Id, quoteId = newQuote.Id}, newQuote);
         }
     }
 }
