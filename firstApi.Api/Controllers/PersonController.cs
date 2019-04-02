@@ -11,17 +11,20 @@ namespace firstApi.Api.Controllers
     public class PersonController : Controller
     {
         [HttpGet()]
-        public JsonResult GetPeople()
+        public IActionResult GetPeople()
         {
-            return new JsonResult(PeopleDataStore.Current.People);
+            return Ok(PeopleDataStore.Current.People);
         }
 
         [HttpGet("{id}")]
-        public JsonResult GetPerson(int id)
+        public IActionResult GetPerson(int id)
         {
-            return new JsonResult(
-                PeopleDataStore.Current.People.FirstOrDefault(p => p.Id == id)
-                );
+            var person = PeopleDataStore.Current.People.FirstOrDefault(p => p.Id == id);
+            if(person == null)
+            {
+                return NotFound();
+            }
+            return Ok(person);
         }
     }
 }
