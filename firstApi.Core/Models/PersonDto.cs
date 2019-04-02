@@ -11,6 +11,12 @@ namespace firstApi.Core.Models
         public string LastName { get; set; }
         public string Description { get; set; }
 
-        public IEnumerable<QuoteDto> Quotes { get; set; }
+        public int NumberofQuotes { get
+            {
+                return Quotes.Count;
+            }
+        }
+
+        public ICollection<QuoteDto> Quotes { get; set; } = new List<QuoteDto>();
     }
 }

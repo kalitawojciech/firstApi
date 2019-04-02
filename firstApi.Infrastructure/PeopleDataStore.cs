@@ -19,14 +19,30 @@ namespace firstApi.Infrastructure
                     Id = 1,
                     FirstName = "Albert",
                     LastName = "Einstein",
-                    Description = "Physicist who developed the theory of relativity."
+                    Description = "Physicist who developed the theory of relativity.",
+                    Quotes = new List<QuoteDto>()
+                    {
+                        new QuoteDto()
+                        {
+                            Id = 1,
+                            Description = "You cannot blame gravity for falling in love."
+                        }
+                    }
                 },
                 new PersonDto()
                 {
                     Id = 2,
                     FirstName = "Benjamin",
                     LastName = "Franklin",
-                    Description = "One of the Founding Fathers of the United States."
+                    Description = "One of the Founding Fathers of the United States.",
+                    Quotes = new List<QuoteDto>()
+                    {
+                        new QuoteDto()
+                        {
+                            Id = 2,
+                            Description = "Tell me and I forget. Teach me and I remember. Involve me and I learn."
+                        }
+                    }
                 }
             };
 
