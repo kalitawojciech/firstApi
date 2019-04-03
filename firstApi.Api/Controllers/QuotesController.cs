@@ -47,6 +47,11 @@ namespace firstApi.Api.Controllers
                 return BadRequest();
             }
 
+            if(!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             var person = PeopleDataStore.Current.People.FirstOrDefault(p => p.Id == personId);
             if (person == null)
             {
