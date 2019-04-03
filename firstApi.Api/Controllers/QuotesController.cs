@@ -70,5 +70,36 @@ namespace firstApi.Api.Controllers
 
             return CreatedAtRoute("GetQuote", new { personId = person.Id, quoteId = newQuote.Id}, newQuote);
         }
+
+        [HttpPut("{personId}/quotes/{quoteId}")]
+        public IActionResult UpdateQuote(int personId, int quoteId,
+            [FromBody] QuoteForUpdateDto quote)
+        {
+            if (quote == null)
+            {
+                return BadRequest();
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var person = PeopleDataStore.Current.People.FirstOrDefault(p => p.Id == personId);
+            if (person == null)
+            {
+                return NotFound();
+            }
+
+            var quoteFromStore = person.Quotes.FirstOrDefault(q => q.Id == quoteId);
+            if(quoteFromStore == null)
+            {
+                return NotFound();
+            }
+
+            quoteFromStore.Description = quote.Description;
+
+            return NoContent();
+        }
     }
 }

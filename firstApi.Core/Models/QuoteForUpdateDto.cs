@@ -5,7 +5,7 @@ using System.Text;
 
 namespace firstApi.Core.Models
 {
-    class QuoteForUpdateDto
+    public class QuoteForUpdateDto
     {
         [Required(ErrorMessage = "You should provide a description.")]
         [MaxLength(200)]
