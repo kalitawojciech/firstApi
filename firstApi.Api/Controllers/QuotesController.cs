@@ -1,5 +1,6 @@
 ﻿using firstApi.Core.Models;
 using firstApi.Infrastructure;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -98,6 +99,46 @@ namespace firstApi.Api.Controllers
             }
 
             quoteFromStore.Description = quote.Description;
+
+            return NoContent();
+        }
+
+        [HttpPatch("{personId}/quotes/{quoteId}")]
+        public IActionResult PartiallyUpdateQuote(int personId, int quoteId,
+            [FromBody] JsonPatchDocument<QuoteForUpdateDto> patchDocument)
+        {
+            if (patchDocument == null)
+            {
+                return BadRequest();
+            }
+
+            var person = PeopleDataStore.Current.People.FirstOrDefault(p => p.Id == personId);
+            if (person == null)
+            {
+                return NotFound();
+            }
+
+            var quoteFromStore = person.Quotes.FirstOrDefault(q => q.Id == quoteId);
+            if (quoteFromStore == null)
+            {
+                return NotFound();
+            }
+
+            var quoteToPatch = new QuoteForUpdateDto()
+            {
+                Description = quoteFromStore.Description
+            };
+
+            patchDocument.ApplyTo(quoteToPatch, ModelState);
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            TryValidateModel(quoteToPatch);
+
+            quoteFromStore.Description = quoteToPatch.Description;
 
             return NoContent();
         }
