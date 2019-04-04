@@ -40,7 +40,7 @@ namespace firstApi.Api.Controllers
             return Ok(quote);
         }
 
-        [HttpPost("{personId}/quote")]
+        [HttpPost("{personId}/quotes")]
         public IActionResult CreateQuote(int personId, [FromBody] QuoteForCreationDto quote)
         {
             if(quote == null)
@@ -139,6 +139,26 @@ namespace firstApi.Api.Controllers
             TryValidateModel(quoteToPatch);
 
             quoteFromStore.Description = quoteToPatch.Description;
+
+            return NoContent();
+        }
+
+        [HttpDelete("{personId}/quotes/{quoteId}")]
+        public IActionResult DeleteQuote(int personId, int quoteId)
+        {
+            var person = PeopleDataStore.Current.People.FirstOrDefault(p => p.Id == personId);
+            if (person == null)
+            {
+                return NotFound();
+            }
+
+            var quoteFromStore = person.Quotes.FirstOrDefault(q => q.Id == quoteId);
+            if (quoteFromStore == null)
+            {
+                return NotFound();
+            }
+
+            person.Quotes.Remove(quoteFromStore);
 
             return NoContent();
         }
