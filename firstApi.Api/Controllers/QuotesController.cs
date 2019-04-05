@@ -2,6 +2,7 @@
 using firstApi.Infrastructure;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,16 +13,33 @@ namespace firstApi.Api.Controllers
     [Route("api/person")]
     public class QuotesController : Controller
     {
+        private ILogger<QuotesController> _logger;
+        public QuotesController(ILogger<QuotesController> logger)
+        {
+            _logger = logger;
+        }
+
         [HttpGet("{personId}/quotes")]
         public IActionResult GetQuotes(int personId)
         {
-            var person = PeopleDataStore.Current.People.FirstOrDefault(p => p.Id == personId);
-            if(person == null)
+            try
             {
-                return NotFound();
+                var person = PeopleDataStore.Current.People.FirstOrDefault(p => p.Id == personId);
+                if (person == null)
+                {
+                    _logger.LogInformation($"Person with id {personId} wasn't found.");
+                    return NotFound();
+                }
+
+                return Ok(person.Quotes);
+            }
+            catch(Exception exception)
+            {
+                _logger.LogCritical($"Exception while getting Quotes for person with id {personId}.", exception);
+                return StatusCode(500, "Sorry, you did something wrong");
             }
 
-            return Ok(person.Quotes);
+
         }
 
         [HttpGet("{personId}/quotes/{quoteId}", Name = "GetQuote")]
