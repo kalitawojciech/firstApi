@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using NLog.Extensions.Logging;
 //using Newtonsoft.Json.Serialization;
 
 namespace firstApi.Api
@@ -34,6 +35,8 @@ namespace firstApi.Api
         {
             loggerFactory.AddConsole();
             loggerFactory.AddDebug();
+            // loggerFactory.AddProvider(new NLog.Extensions.Logging.NLogLoggerProvider());
+            loggerFactory.AddNLog();
 
             if (env.IsDevelopment())
             {
