@@ -1,4 +1,5 @@
 ﻿using firstApi.Core.Models;
+using firstApi.Core.Services;
 using firstApi.Infrastructure;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
@@ -14,9 +15,11 @@ namespace firstApi.Api.Controllers
     public class QuotesController : Controller
     {
         private ILogger<QuotesController> _logger;
-        public QuotesController(ILogger<QuotesController> logger)
+        private LocalMailService _localMailService;
+        public QuotesController(ILogger<QuotesController> logger, LocalMailService localMailService)
         {
             _logger = logger;
+            _localMailService = localMailService;
         }
 
         [HttpGet("{personId}/quotes")]
@@ -177,6 +180,8 @@ namespace firstApi.Api.Controllers
             }
 
             person.Quotes.Remove(quoteFromStore);
+
+            _localMailService.Send("Quotes deleted.", $"Quote {quoteFromStore.Description} with id {quoteFromStore.Id} was deleted.");
 
             return NoContent();
         }
