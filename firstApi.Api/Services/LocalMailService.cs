@@ -1,4 +1,5 @@
-﻿using firstApi.Core.Interfaces;
+﻿using firstApi.Api;
+using firstApi.Core.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -8,8 +9,8 @@ namespace firstApi.Core.Services
 {
     public class LocalMailService : IMailService
     {
-        private string _mailTo = "admin@example.com";
-        private string _mailFrom = "noreply@example.com";
+        private string _mailTo = Startup.Configuration["mailSettings:mailToAddress"];
+        private string _mailFrom = Startup.Configuration["mailSettings:mailFromAddress"];
 
         public void Send(string subject, string message)
         {

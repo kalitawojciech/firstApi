@@ -1,4 +1,5 @@
-﻿using firstApi.Core.Models;
+﻿using firstApi.Core.Interfaces;
+using firstApi.Core.Models;
 using firstApi.Core.Services;
 using firstApi.Infrastructure;
 using Microsoft.AspNetCore.JsonPatch;
@@ -15,8 +16,8 @@ namespace firstApi.Api.Controllers
     public class QuotesController : Controller
     {
         private ILogger<QuotesController> _logger;
-        private LocalMailService _localMailService;
-        public QuotesController(ILogger<QuotesController> logger, LocalMailService localMailService)
+        private IMailService _localMailService;
+        public QuotesController(ILogger<QuotesController> logger, IMailService localMailService)
         {
             _logger = logger;
             _localMailService = localMailService;

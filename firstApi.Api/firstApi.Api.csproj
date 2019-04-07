@@ -17,4 +17,6 @@
     <ProjectReference Include="..\firstApi.Infrastructure\firstApi.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ProjectExtensions><VisualStudio><UserProperties /></VisualStudio></ProjectExtensions>
+
 </Project>
