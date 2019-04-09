@@ -10,7 +10,7 @@ namespace firstApi.Infrastructure
     {
         public PersonInfoContext(DbContextOptions<PersonInfoContext> options) : base(options)
         {
-            Database.EnsureCreated();
+            Database.Migrate();
         }
 
         public DbSet<Person> People { get; set; }
