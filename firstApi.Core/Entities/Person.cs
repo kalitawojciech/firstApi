@@ -6,7 +6,7 @@ using System.Text;
 
 namespace firstApi.Core.Entities
 {
-    class Person
+    public class Person
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

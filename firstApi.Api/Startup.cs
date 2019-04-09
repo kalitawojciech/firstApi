@@ -4,9 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using firstApi.Core.Interfaces;
 using firstApi.Core.Services;
+using firstApi.Infrastructure;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -43,6 +45,8 @@ namespace firstApi.Api
 #else 
             services.AddTransient<IMailService, CloudMailService>();
 #endif
+            var connectionString = @"Server=(localdb)\mssqllocaldb;Database=PersonInfoDB;Trusted_Connection=true;";
+            services.AddDbContext<PersonInfoContext>(o => o.UseSqlServer(connectionString));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
