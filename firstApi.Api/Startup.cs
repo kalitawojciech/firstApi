@@ -45,7 +45,7 @@ namespace firstApi.Api
 #else 
             services.AddTransient<IMailService, CloudMailService>();
 #endif
-            var connectionString = @"Server=(localdb)\mssqllocaldb;Database=PersonInfoDB;Trusted_Connection=true;";
+            var connectionString = Startup.Configuration["connectionString:personInfoDBConnectionString"];
             services.AddDbContext<PersonInfoContext>(o => o.UseSqlServer(connectionString));
         }
 
