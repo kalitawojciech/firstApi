@@ -1,4 +1,5 @@
-﻿using firstApi.Core.Entities;
+﻿using AutoMapper;
+using firstApi.Core.Entities;
 using firstApi.Core.Interfaces;
 using firstApi.Core.Models;
 using firstApi.Infrastructure;
@@ -23,17 +24,7 @@ namespace firstApi.Api.Controllers
         public IActionResult GetPeople()
         {
             var personEntities = _personRepository.GetPeople();
-            var result = new List<PersonWithoutQuotesDto>();
-            foreach(var personEntity in personEntities)
-            {
-                result.Add(new PersonWithoutQuotesDto
-                {
-                    Id = personEntity.Id,
-                    FirstName = personEntity.FirstName,
-                    LastName = personEntity.LastName,
-                    Description = personEntity.Description
-                });
-            }
+            var result = Mapper.Map<IEnumerable<PersonWithoutQuotesDto>>(personEntities);
             return Ok(result);
 
         }
@@ -42,44 +33,20 @@ namespace firstApi.Api.Controllers
         public IActionResult GetPerson(int id, bool includeQuotes = false)
         {
             var person = _personRepository.GetPerson(id, includeQuotes);
+
             if(person == null)
             {
                 return NotFound();
             }
+
             if(includeQuotes)
             {
-                var personResult = new PersonDto()
-                {
-                    Id = person.Id,
-                    FirstName = person.FirstName,
-                    LastName = person.LastName,
-                    Description = person.Description
-                };
-                foreach(var qt in person.Quotes)
-                {
-                    personResult.Quotes.Add(new QuoteDto()
-                    {
-                        Id = qt.Id,
-                        Description = qt.Description
-                    });
-                }
+                var personResult = Mapper.Map<PersonDto>(person);
                 return Ok(personResult);
             }
-            var personWithoutQuotesResult = new PersonWithoutQuotesDto()
-            {
-                Id = person.Id,
-                FirstName = person.FirstName,
-                LastName = person.LastName,
-                Description = person.Description
-            };
 
+            var personWithoutQuotesResult = Mapper.Map<IEnumerable<PersonWithoutQuotesDto>>(person);
             return Ok(personWithoutQuotesResult);
-            //var person = PeopleDataStore.Current.People.FirstOrDefault(p => p.Id == id);
-            //if(person == null)
-            //{
-            //    return NotFound();
-            //}
-            //return Ok(person);
         }
     }
 }

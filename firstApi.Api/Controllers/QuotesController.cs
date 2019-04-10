@@ -1,4 +1,5 @@
-﻿using firstApi.Core.Interfaces;
+﻿using AutoMapper;
+using firstApi.Core.Interfaces;
 using firstApi.Core.Models;
 using firstApi.Core.Services;
 using firstApi.Infrastructure;
@@ -37,26 +38,17 @@ namespace firstApi.Api.Controllers
                     return NotFound();
                 }
 
-                var quotesForCity = _personRepository.GetQuotesForPerson(personId);
-                var quotesForCityResult = new List<QuoteDto>();
-                foreach(var q in quotesForCity)
-                {
-                    quotesForCityResult.Add(new QuoteDto()
-                    {
-                        Id = q.Id,
-                        Description = q.Description
-                    });
-                }
+                var quotesForPerson = _personRepository.GetQuotesForPerson(personId);
+                var quotesForPersonResult = Mapper.Map<IEnumerable<QuoteDto>>(quotesForPerson);
 
-                return Ok(quotesForCityResult);
+                return Ok(quotesForPersonResult);
             }
+
             catch(Exception exception)
             {
                 _logger.LogCritical($"Exception while getting Quotes for person with id {personId}.", exception);
                 return StatusCode(500, "Sorry, you did something wrong");
             }
-
-
         }
 
         [HttpGet("{personId}/quotes/{quoteId}", Name = "GetQuote")]
@@ -72,11 +64,7 @@ namespace firstApi.Api.Controllers
             {
                 return NotFound();
             }
-            var quoteResult = new QuoteDto()
-            {
-                Id = quote.Id,
-                Description = quote.Description
-            };
+            var quoteResult = Mapper.Map<QuoteDto>(quote);
             return Ok(quoteResult);
         }
 

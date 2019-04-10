@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using firstApi.Core.Entities;
 using firstApi.Core.Interfaces;
+using firstApi.Core.Models;
 using firstApi.Core.Services;
 using firstApi.Infrastructure;
 using Microsoft.AspNetCore.Builder;
@@ -65,6 +67,15 @@ namespace firstApi.Api
             }
 
             personInfoContext.EnsureSeedDataForContext();
+
+            AutoMapper.Mapper.Initialize(cfg =>
+            {
+                cfg.CreateMap<Person, PersonWithoutQuotesDto>();
+                cfg.CreateMap<Person, PersonDto>();
+                cfg.CreateMap<Quote, QuoteDto>();
+                cfg.CreateMap<QuoteDto, Quote>();
+            });
+
             app.UseMvc();
             app.UseStatusCodePages();
             app.Run(async (context) =>
