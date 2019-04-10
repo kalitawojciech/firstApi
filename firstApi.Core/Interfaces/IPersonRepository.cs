@@ -7,6 +7,7 @@ namespace firstApi.Core.Interfaces
 {
     public interface IPersonRepository
     {
+        bool PersonExist(int personId);
         IEnumerable<Person> GetPeople();
         Person GetPerson(int personId, bool includeQuotes);
         IEnumerable<Quote> GetQuotesForPerson(int personId);

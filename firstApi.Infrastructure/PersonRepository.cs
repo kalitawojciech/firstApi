@@ -17,6 +17,11 @@ namespace firstApi.Infrastructure
             _context = context;
         }
 
+        public bool PersonExist(int personId)
+        {
+            return _context.People.Any(p => p.Id == personId);
+        }
+
         public IEnumerable<Person> GetPeople()
         {
             return _context.People.OrderBy(p => p.Id).ToList();

@@ -17,10 +17,13 @@ namespace firstApi.Api.Controllers
     {
         private ILogger<QuotesController> _logger;
         private IMailService _localMailService;
-        public QuotesController(ILogger<QuotesController> logger, IMailService localMailService)
+        private IPersonRepository _personRepository;
+
+        public QuotesController(ILogger<QuotesController> logger, IMailService localMailService, IPersonRepository personRepository)
         {
             _logger = logger;
             _localMailService = localMailService;
+            _personRepository = personRepository;
         }
 
         [HttpGet("{personId}/quotes")]
@@ -28,14 +31,24 @@ namespace firstApi.Api.Controllers
         {
             try
             {
-                var person = PeopleDataStore.Current.People.FirstOrDefault(p => p.Id == personId);
-                if (person == null)
+                if(!_personRepository.PersonExist(personId))
                 {
                     _logger.LogInformation($"Person with id {personId} wasn't found.");
                     return NotFound();
                 }
 
-                return Ok(person.Quotes);
+                var quotesForCity = _personRepository.GetQuotesForPerson(personId);
+                var quotesForCityResult = new List<QuoteDto>();
+                foreach(var q in quotesForCity)
+                {
+                    quotesForCityResult.Add(new QuoteDto()
+                    {
+                        Id = q.Id,
+                        Description = q.Description
+                    });
+                }
+
+                return Ok(quotesForCityResult);
             }
             catch(Exception exception)
             {
@@ -49,17 +62,22 @@ namespace firstApi.Api.Controllers
         [HttpGet("{personId}/quotes/{quoteId}", Name = "GetQuote")]
         public IActionResult GetQuote(int personId, int quoteId)
         {
-            var person = PeopleDataStore.Current.People.FirstOrDefault(p => p.Id == personId);
-            if(person == null)
+            if (!_personRepository.PersonExist(personId))
             {
+                _logger.LogInformation($"Person with id {personId} wasn't found.");
                 return NotFound();
             }
-            var quote = person.Quotes.FirstOrDefault(q => q.Id == quoteId);
+            var quote = _personRepository.GetQuoteForPerson(personId, quoteId);
             if(quote == null)
             {
                 return NotFound();
             }
-            return Ok(quote);
+            var quoteResult = new QuoteDto()
+            {
+                Id = quote.Id,
+                Description = quote.Description
+            };
+            return Ok(quoteResult);
         }
 
         [HttpPost("{personId}/quotes")]
