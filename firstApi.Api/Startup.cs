@@ -47,6 +47,8 @@ namespace firstApi.Api
 #endif
             var connectionString = Startup.Configuration["connectionString:personInfoDBConnectionString"];
             services.AddDbContext<PersonInfoContext>(o => o.UseSqlServer(connectionString));
+
+            services.AddScoped<IPersonRepository, PersonRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
