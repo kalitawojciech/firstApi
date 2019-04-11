@@ -12,5 +12,8 @@ namespace firstApi.Core.Interfaces
         Person GetPerson(int personId, bool includeQuotes);
         IEnumerable<Quote> GetQuotesForPerson(int personId);
         Quote GetQuoteForPerson(int personId, int quoteId);
+        void AddQuoteForPerson(int personId, Quote quote);
+        bool Save();
+        void DeleteQuote(Quote quote);
     }
 }

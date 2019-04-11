@@ -73,7 +73,9 @@ namespace firstApi.Api
                 cfg.CreateMap<Person, PersonWithoutQuotesDto>();
                 cfg.CreateMap<Person, PersonDto>();
                 cfg.CreateMap<Quote, QuoteDto>();
-                cfg.CreateMap<QuoteDto, Quote>();
+                cfg.CreateMap<QuoteForCreationDto, Quote>();
+                cfg.CreateMap<QuoteForUpdateDto, Quote>();
+                cfg.CreateMap<Quote, QuoteForUpdateDto>();
             });
 
             app.UseMvc();

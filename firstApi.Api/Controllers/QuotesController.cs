@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using firstApi.Core.Entities;
 using firstApi.Core.Interfaces;
 using firstApi.Core.Models;
 using firstApi.Core.Services;
@@ -64,7 +65,7 @@ namespace firstApi.Api.Controllers
             {
                 return NotFound();
             }
-            var quoteResult = Mapper.Map<QuoteDto>(quote);
+            var quoteResult = Mapper.Map<QuoteDto>(quote); 
             return Ok(quoteResult);
         }
 
@@ -81,23 +82,21 @@ namespace firstApi.Api.Controllers
                 return BadRequest(ModelState);
             }
 
-            var person = PeopleDataStore.Current.People.FirstOrDefault(p => p.Id == personId);
-            if (person == null)
+            if(!_personRepository.PersonExist(personId))
             {
                 return NotFound();
             }
 
-            var maxQuoteId = PeopleDataStore.Current.People.SelectMany(q => q.Quotes).Max(q => q.Id);
+            var newQuote = Mapper.Map<Quote>(quote);
+            _personRepository.AddQuoteForPerson(personId, newQuote);
 
-            var newQuote = new QuoteDto()
+            if(!_personRepository.Save())
             {
-                Id = ++maxQuoteId,
-                Description = quote.Description
-            };
+                return StatusCode(500, "Sorry, you did something wrong");
+            }
 
-            person.Quotes.Add(newQuote);
-
-            return CreatedAtRoute("GetQuote", new { personId = person.Id, quoteId = newQuote.Id}, newQuote);
+            var createdQuoteToReturn = Mapper.Map<QuoteDto>(newQuote);
+            return CreatedAtRoute("GetQuote", new { personId = personId, quoteId = createdQuoteToReturn.Id}, createdQuoteToReturn);
         }
 
         [HttpPut("{personId}/quotes/{quoteId}")]
@@ -114,19 +113,22 @@ namespace firstApi.Api.Controllers
                 return BadRequest(ModelState);
             }
 
-            var person = PeopleDataStore.Current.People.FirstOrDefault(p => p.Id == personId);
-            if (person == null)
+            if (!_personRepository.PersonExist(personId))
             {
                 return NotFound();
             }
 
-            var quoteFromStore = person.Quotes.FirstOrDefault(q => q.Id == quoteId);
-            if(quoteFromStore == null)
+            var quoteEntity = _personRepository.GetQuoteForPerson(personId, quoteId);
+            if (quoteEntity == null)
             {
-                return NotFound();
+                return BadRequest();
             }
 
-            quoteFromStore.Description = quote.Description;
+            Mapper.Map(quote, quoteEntity);
+            if(!_personRepository.Save())
+            {
+                return StatusCode(500, "Sorry, something wrong");
+            }
 
             return NoContent();
         }
@@ -140,55 +142,62 @@ namespace firstApi.Api.Controllers
                 return BadRequest();
             }
 
-            var person = PeopleDataStore.Current.People.FirstOrDefault(p => p.Id == personId);
-            if (person == null)
+            if (!_personRepository.PersonExist(personId))
             {
                 return NotFound();
             }
 
-            var quoteFromStore = person.Quotes.FirstOrDefault(q => q.Id == quoteId);
-            if (quoteFromStore == null)
+            var quoteEntity = _personRepository.GetQuoteForPerson(personId, quoteId);
+            if (quoteEntity == null)
             {
-                return NotFound();
+                return BadRequest();
             }
 
-            var quoteToPatch = new QuoteForUpdateDto()
-            {
-                Description = quoteFromStore.Description
-            };
+            var quoteToPatch = Mapper.Map<QuoteForUpdateDto>(quoteEntity);
 
             patchDocument.ApplyTo(quoteToPatch, ModelState);
-
-            if (!ModelState.IsValid)
+            if(!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
             TryValidateModel(quoteToPatch);
 
-            quoteFromStore.Description = quoteToPatch.Description;
+            if(!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
+            Mapper.Map(quoteToPatch, quoteEntity);
+
+            if (!_personRepository.Save())
+            {
+                return StatusCode(500, "Sorry, something wrong");
+            }
             return NoContent();
         }
 
         [HttpDelete("{personId}/quotes/{quoteId}")]
         public IActionResult DeleteQuote(int personId, int quoteId)
         {
-            var person = PeopleDataStore.Current.People.FirstOrDefault(p => p.Id == personId);
-            if (person == null)
+            if (!_personRepository.PersonExist(personId))
             {
                 return NotFound();
             }
 
-            var quoteFromStore = person.Quotes.FirstOrDefault(q => q.Id == quoteId);
-            if (quoteFromStore == null)
+            var quoteEntity = _personRepository.GetQuoteForPerson(personId, quoteId);
+            if(quoteEntity == null)
             {
                 return NotFound();
             }
 
-            person.Quotes.Remove(quoteFromStore);
+            _personRepository.DeleteQuote(quoteEntity);
+            if (!_personRepository.Save())
+            {
+                return StatusCode(500, "Sorry, something wrong");
+            }
 
-            _localMailService.Send("Quotes deleted.", $"Quote {quoteFromStore.Description} with id {quoteFromStore.Id} was deleted.");
+            _localMailService.Send("Quotes deleted.", $"Quote {quoteEntity.Description} with id {quoteEntity.Id} was deleted.");
 
             return NoContent();
         }

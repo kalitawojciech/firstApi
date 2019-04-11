@@ -46,5 +46,21 @@ namespace firstApi.Infrastructure
         {
             return _context.Quotes.Where(p => p.Id == personId).ToList();
         }
+
+        public void AddQuoteForPerson(int personId, Quote quote)
+        {
+            var person = GetPerson(personId, false);
+            person.Quotes.Add(quote);
+        }
+
+        public bool Save()
+        {
+            return (_context.SaveChanges() >= 0);
+        }
+
+        public void DeleteQuote(Quote quote)
+        {
+            _context.Quotes.Remove(quote);
+        }
     }
 }
